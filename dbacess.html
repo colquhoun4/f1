@@ -1,0 +1,25 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<%@ page import="java.sql.*" %>
+<!DOCTYPE html>
+<html>
+<head>
+<title>Database Access</title>
+</head>
+<body>
+<%
+Class.forName("com.mysql.jdbc.Driver");
+
+Connection con = DriverManager.getConnection("jdbc:mysql://LocalHost:3306/formula1","root","admin");
+
+PreparedStatement statement = con.prepareStatement("SELECT event_id,nm_formal FROM formula1.f1_events where event_id like '%1990%'");
+
+ResultSet result = statement.executeQuery();
+
+while (result.next())
+{
+	System.out.println(result.getString(1)+ result.getString(2));
+}
+%>
+</body>
+</html>
