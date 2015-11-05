@@ -13,7 +13,7 @@ else{
 $queryEvent = "SELECT DISTINCT nm_common FROM f1_events ORDER BY nm_common";
 $gps= mysqli_query($link,$queryEvent);
 
-$queryDriver = "SELECT nm_common, nationality  FROM f1_drivers"; 
+$queryDriver = "SELECT nm_common, nationality, driver_id  FROM f1_drivers"; 
 $drivers = mysqli_query($link,$queryDriver);
 
 $queryCircuit = "SELECT DISTINCT circuit_id, circuit_nm FROM f1_circuits"; 
@@ -90,11 +90,10 @@ $submittedValue = "";
 			<?php
 				foreach($drivers as $indiv):
 			?>
-				<option value = "<?php echo $indiv['nm_common'];?>">
+				<option value = "<?php echo $indiv['driver_id'];?>">
 					<?php
 						echo "<th>$indiv[nm_common]</th>";
-					?>
-					
+					?>	
 				</option>
 			<?php
 				endforeach;

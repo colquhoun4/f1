@@ -21,8 +21,8 @@ else{
 	echo 'Driver&nbspBio&nbspPage';	
 }
 
-$sql = "SELECT DISTINCT * FROM f1_drivers where nm_common ='{$_GET['driver']}'";
-$natl = "SELECT COUNT(nationality) AS ttlnatl FROM f1_drivers where nationality ='France'";
+$sql = "SELECT DISTINCT * FROM f1_drivers where driver_id ='{$_GET['driver']}'";
+$_SESSION['drvrid']=$_GET['driver'];
 
 echo "<div class = container>";
 if($result = mysqli_query($link,$sql)){
@@ -31,14 +31,10 @@ if($result = mysqli_query($link,$sql)){
 	
         while($row = mysqli_fetch_array($result)){
 		echo "<tbody>";
-            echo "<tr>";
-		echo "<tr>";
-		echo "<tr>";
-                echo "<td>Name:\t" . $row['nm_common'] . "</td>"."<tr>";
-		echo "<td>Birth Name:\t" . $row['nm_birth'] . "</td>"."<tr>";
-		echo "<td>Nationality:\t " . $row['nationality'] . "</td>"."<tr>";
-		echo "<td>Birthdate:\t " . $row['birthdate'] . "</td>"."<tr>";
-            echo "</tr>";
+                echo "<td>Name:\t" . $row['nm_common'] . "</td><tr>";
+		echo "<td>Birth Name:\t" . $row['nm_birth'] . "</td><tr>";
+		echo "<td>Nationality:\t "."<span class = menuitem><a href=drvrnatl.php>".$row['nationality']."</a></span>"."</td><tr>";
+		echo "<td>Birthdate:\t " . $row['birthdate'] . "</td><tr>";
 		echo "</tbody>";
         }
         echo "</table>";
