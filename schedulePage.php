@@ -10,11 +10,12 @@ else{
 	echo "{$_GET['season']} Season Calendar";
 }
 
-$sql = "SELECT DISTINCT event_id, substr(event_id,5,2) as Round, nm_common,laps,start_time, circuit_nm, crts.circuit_id AS cirid, flags
-	FROM f1_events evnts, f1_circuits crts, flags
+$sql = "SELECT DISTINCT event_id, substr(event_id,5,2) as Round, nm_common,laps,start_time, circuit_nm, crts.circuit_id AS cirid, flags,weather_icon
+	FROM f1_events2 evnts, f1_circuits crts, flags, weather wthr
 	WHERE event_id like'{$_GET['season']}%' 
 		AND evnts.circuit_id = crts.circuit_version_id
 		AND crts.cntry = flags.country_name
+		AND evnts.weather_id = wthr.weather_id
 	ORDER BY Round";
 
 
@@ -27,6 +28,7 @@ if($result = mysqli_query($link,$sql)){
 		echo "<th>Country</th>";
 		echo "<th>Laps</th>";
 		echo "<th>Start Time</th>";
+		echo "<th>Weather</th>";
 		echo "<th>Circuit</th>";
             echo "</tr>";
         while($row = mysqli_fetch_array($result)){
@@ -35,7 +37,8 @@ if($result = mysqli_query($link,$sql)){
 		echo "<td>" . $row['nm_common'] . "</td>";
 	        echo '<td>'.'<img src="data:image/jpeg;base64,'.base64_encode( $row['flags'] ).'" width = 40 height = 24"/>'.'</td>';
 		echo "<td>" . $row['laps'] . "</td>";
-		echo "<td>" . $row['start_time'] . "</td>";	
+		echo "<td>" . $row['start_time'] . "</td>";
+		echo '<td>'.'<img src="data:image/jpeg;base64,'.base64_encode( $row['weather_icon'] ).'" width = 40 height = 24"/>'.'</td>';	
 		echo "<td>"."<span class=menuitem><a href=circuitPage.php?circuit=".$row['cirid']."&submit=Submit>".$row['circuit_nm']."</a></span>"."</td>";
             echo "</tr>";
         }

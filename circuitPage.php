@@ -19,26 +19,37 @@ if($link === false){
 else{
 	echo 'Circuit&nbspInfo&nbspAND&nbspHistory&nbsp';
 }
-$sql3 = "SELECT DISTINCT cntry, city, flags  FROM  f1_circuits crt INNER JOIN flags where crt.circuit_id like '{$_GET['circuit']}%' 
-	AND flags.country_name= crt.cntry";
+$gen_circuit_info = "	SELECT DISTINCT cntry, city, CONCAT(city,', ', cntry) as location, flags, count(nm_formal) AS cnt_events,
+			MIN(yr_first) as first_yr, MAX(yr_last) as last_yr
+			FROM  f1_circuits crt INNER JOIN flags, f1_events2 
+			WHERE 
+				crt.circuit_id like '{$_GET['circuit']}%' 
+				AND 
+				flags.country_name= crt.cntry
+				AND
+				f1_events2.circuit_id = crt.circuit_version_id";
+
 
 echo "<div class = container>";
-if($result3 = mysqli_query($link,$sql3)){
+echo "<div class = table-responsivness>";
+if($result3 = mysqli_query($link,$gen_circuit_info)){
 	if(mysqli_num_rows($result3)>0)
 	{
 		echo "<table class = table>";
 			echo "<thead>";
-		  		echo "<tr>";
-				echo "<th>Country:\t</th>";
-				echo "<th>City:\t</th>";
-            			echo "</tr>";
+				echo "<th><p class = text-center>Location:\t</p></th>";
+				echo "<th><p class = text-center>Number of races held:\t</p></th>";
+				echo "<th><p class = text-center>First Year held:\t</p></th>";
+				echo "<th><p class = text-center>Last Year held:\t</p></th>";
 			echo "</thead>";
         while($row = mysqli_fetch_array($result3))
 	{
 			echo "<tbody>";
         			echo "<tr>";
-				echo "<td>".$row['cntry']."</td>";
-				echo "<td>".$row['city']."</td>";
+				echo "<td><p class = text-center>".$row['location']."</p></td>";
+				echo "<td><p class = text-center>".$row['cnt_events']."</p></td>";
+				echo "<td><p class = text-center>".$row['first_yr']."</p></td>";
+				echo "<td><p class = text-center>".$row['last_yr']."</p></td>";
 	        		echo '<p class = "text-center">'.'<img src="data:image/jpeg;base64,'.base64_encode( $row['flags'] ).'" width = 400 height = 240"/>'.'</p>';
      	 			echo "</tr>";	
 			echo "</tbody>";
@@ -53,53 +64,65 @@ if($result3 = mysqli_query($link,$sql3)){
 } 
 else
 {
-    echo "ERROR: Could not execute $sql3. " . mysqli_error($link);
+    echo "ERROR: Could not execute $gen_circuit_info. " . mysqli_error($link);
 }
 echo "</div>";
+echo "</div>";
 
-
-$sql2 = "SELECT version_num,circuit_nm,cntry,city, CAST(length_km AS DECIMAL(6,3)) AS length_km,yr_first,yr_last FROM  f1_circuits crt  where crt.circuit_id like '{$_GET['circuit']}%'";
-echo "<div class = container>";
-if($result2 = mysqli_query($link,$sql2)){
+$circuit_history = 	"SELECT version_num,circuit_nm,cntry,city, CAST(length_km AS DECIMAL(6,3)) AS length_km,yr_first,yr_last,circuit_image 
+			FROM  f1_circuits crt  
+			WHERE crt.circuit_id like '{$_GET['circuit']}%'";
+echo "<div class = col-xs-3>";
+echo "</div>";
+echo "<div class = col-xs-3>";
+echo "<div class = table-responsive>";
+if($result2 = mysqli_query($link,$circuit_history)){
 	if(mysqli_num_rows($result2)>0){
-		echo "<table class = table>";
-		echo "<thead>";
-		  echo "<tr>";
-			echo "<th>Circuit Iteration: \t</th>";
-                	echo "<th>Track Name:\t</th>";
-			echo "<th>Country:\t</th>";
-			echo "<th>City:\t</th>";
-			echo "<th>Length(KM):\t</th>";
-			echo "<th>First Year:\t</th>";
-			echo "<th>Last Year:\t</th>";
-            echo "</tr>";
-		echo "</thead>";
+	echo "<table class = table>";
         while($row = mysqli_fetch_array($result2)){
 		echo "<tbody>";
-            echo "<tr>";
-		echo "<tr>";
-		echo "<tr>";
-		echo "<td>".$row['version_num']."</td>";
-		echo "<td>".$row['circuit_nm']."</td>";
-		echo "<td>".$row['cntry']."</td>";
-		echo "<td>".$row['city']."</td>";
-		echo "<td>".$row['length_km']."</td>";
-		echo "<td>".$row['yr_first']."</td>";
-		echo "<td>".$row['yr_last']."</td>";
+		echo "<td><p class = text-right>Circuit Iteration: ".$row['version_num']."</p></td><tr>";
+		echo "<td><p class = text-right>Track Name:".$row['circuit_nm']."</p></td><tr>";
+		echo "<td><p class = text-right>Length(KM)".$row['length_km']."</p></td><tr>";
+		echo "<td><p class = text-right>First Year:".$row['yr_first']."</p></td><tr>";
+		echo "<td><p class = text-right>Last Year:".$row['yr_last']."</p></td><tr>";
             echo "</tr>";	
 		echo "</tbody>";
         }
-        echo "</table>";
+     	echo "</table>";
         mysqli_free_result($result2);
     } else{
         echo "No records matching your query were found.";
     }
 } else{
-    echo "ERROR: Could not execute $sql2. " . mysqli_error($link);
+    echo "ERROR: Could not execute $circuit_history. " . mysqli_error($link);
 }
 echo "</div>";
-
-$sql = "SELECT nm_formal, date, CAST((length_km*laps) AS DECIMAL(6,3)) AS ttl_dist, laps, circuit_nm, version_num FROM  f1_circuits crt INNER JOIN f1_events evnt where crt.circuit_id like '{$_GET['circuit']}%' 
+echo "</div>";
+echo "<div class = col-xs-3>";
+echo "<div class = table-responsive>";
+if($result2 = mysqli_query($link,$circuit_history )){
+	if(mysqli_num_rows($result2)>0){
+	echo "<table class = table>";
+        while($row = mysqli_fetch_array($result2)){
+		echo "<tbody>";
+		echo '<p class = "text-center">'.'<img src="data:image/jpeg;base64,'.base64_encode( $row['circuit_image'] ).'" width = 350 height = 225"/>'.'</p>';
+            echo "</tr>";	
+		echo "</tbody>";
+        }
+     	echo "</table>";
+        mysqli_free_result($result2);
+    } else{
+        echo "No records matching your query were found.";
+    }
+} else{
+    echo "ERROR: Could not execute $circuit_history . " . mysqli_error($link);
+}
+echo "</div>";
+echo "</div>";
+echo "<div class = col-xs-3>";
+echo "</div>";
+$sql = "SELECT nm_formal, date, CAST((length_km*laps) AS DECIMAL(6,3)) AS ttl_dist, laps, circuit_nm, version_num FROM  f1_circuits crt INNER JOIN f1_events2 evnt where crt.circuit_id like '{$_GET['circuit']}%' 
 	AND evnt.circuit_id = crt.circuit_version_id";
 echo "<div class = container>";
 if($result = mysqli_query($link,$sql)){
