@@ -8,7 +8,26 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 </head>
-<body style="background-color:lightgrey">
+<body style="background-color:#B8B8B8 ">
+<style>
+	.panel-heading {
+			background-color:black;
+			color:#ffffff;
+		 	font-size: 25px;
+			font-family: "Arial Black", Gadget, sans-serif
+			}	
+	.panel-body 	{
+			background-color:grey;
+			color:black; 
+			font-size: 18px;
+			
+			}	
+
+	.panel-footer 	{
+			background-color:white;
+			color:black; 
+			}	
+</style>
 
 <?php
 session_start();
@@ -69,54 +88,39 @@ else
 echo "</div>";
 echo "</div>";
 
-$circuit_history = 	"SELECT version_num,circuit_nm,cntry,city, CAST(length_km AS DECIMAL(6,3)) AS length_km,yr_first,yr_last,circuit_image 
-			FROM  f1_circuits crt  
-			WHERE crt.circuit_id like '{$_GET['circuit']}%'";
+$circuit_history = 	"SELECT version_num,circuit_nm,cntry,city, CAST(length_km AS DECIMAL(6,3)) AS length_km,yr_first,yr_last,circuit_image,count(evnt.event_id) AS num_races
+			FROM  f1_circuits crt INNER JOIN  f1_events2 evnt 
+			WHERE 
+				crt.circuit_id like '{$_GET['circuit']}%' 
+				AND 
+				evnt.circuit_id = crt.circuit_version_id
+			GROUP BY crt.circuit_version_id";
+
 echo "<div class = col-xs-3>";
 echo "</div>";
-echo "<div class = col-xs-3>";
+echo "<div class = col-xs-6>";
 echo "<div class = table-responsive>";
 if($result2 = mysqli_query($link,$circuit_history)){
 	if(mysqli_num_rows($result2)>0){
-	echo "<table class = table>";
         while($row = mysqli_fetch_array($result2)){
-		echo "<tbody>";
-		echo "<td><p class = text-right>Circuit Iteration: ".$row['version_num']."</p></td><tr>";
-		echo "<td><p class = text-right>Track Name:".$row['circuit_nm']."</p></td><tr>";
-		echo "<td><p class = text-right>Length(KM)".$row['length_km']."</p></td><tr>";
-		echo "<td><p class = text-right>First Year:".$row['yr_first']."</p></td><tr>";
-		echo "<td><p class = text-right>Last Year:".$row['yr_last']."</p></td><tr>";
-            echo "</tr>";	
-		echo "</tbody>";
+		echo "<div class = panel panel-primary>
+			<div class = panel-heading><p class = text-center>Iteration ".$row['version_num']."</p></div>
+			<div class = panel-body>
+				<p class = text-center>".$row['circuit_nm']."</p>
+				<p class = text-center>Length (KM): ".$row['length_km']."</p>
+				<p class = text-center>".$row['num_races']." grands prix held from ".$row['yr_first']." to ".$row['yr_last']."</p>
+			</div>
+			<div class = panel-footer>
+				<p class = text-center><img src=data:image/jpeg;base64,".base64_encode( $row['circuit_image'] )." class=img-rounded width = 350 height = 225>
+			</div>
+		</div>";
         }
-     	echo "</table>";
         mysqli_free_result($result2);
     } else{
         echo "No records matching your query were found.";
     }
 } else{
     echo "ERROR: Could not execute $circuit_history. " . mysqli_error($link);
-}
-echo "</div>";
-echo "</div>";
-echo "<div class = col-xs-3>";
-echo "<div class = table-responsive>";
-if($result2 = mysqli_query($link,$circuit_history )){
-	if(mysqli_num_rows($result2)>0){
-	echo "<table class = table>";
-        while($row = mysqli_fetch_array($result2)){
-		echo "<tbody>";
-		echo '<p class = "text-center">'.'<img src="data:image/jpeg;base64,'.base64_encode( $row['circuit_image'] ).'" width = 350 height = 225"/>'.'</p>';
-            echo "</tr>";	
-		echo "</tbody>";
-        }
-     	echo "</table>";
-        mysqli_free_result($result2);
-    } else{
-        echo "No records matching your query were found.";
-    }
-} else{
-    echo "ERROR: Could not execute $circuit_history . " . mysqli_error($link);
 }
 echo "</div>";
 echo "</div>";
@@ -131,7 +135,7 @@ if($result = mysqli_query($link,$sql)){
 		echo "<thead>";
 		  echo "<tr>";
                 	echo "<th>Official Event Name:\t</th>";
-			echo "<th>Date:\t</th>";
+			echo "<th>Date:</th>";
 			echo "<th>Distance:\t</th>";
 			echo "<th>Laps:\t</th>";
 			echo "<th>Circuit Name:\t</th>";
@@ -143,7 +147,7 @@ echo "</thead>";
 		echo "<tr>";
 		echo "<tr>";
 		echo "<td>".$row['nm_formal']."</td>";
-		echo "<td>".$row['date']."</td>";
+		echo "<td><p class = text-right>".$row['date']."<p></td>";
 		echo "<td>" . $row['ttl_dist'] . "</td>";
 		echo "<td>" . $row['laps'] . "</td>";
 		echo "<td>" . $row['circuit_nm'] . "</td>";

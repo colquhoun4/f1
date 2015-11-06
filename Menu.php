@@ -8,7 +8,19 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
   <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 </head>
-<body style="background-color:lightgrey">
+<body style="background-color:black">
+<style>
+	.jumbotron {
+		background-color:#f4511e; /* Orange*/
+		color:black;
+}
+
+</style>
+<div class = "jumbotron text-center">
+<h1><img src="alfaromeo_158_ninofarina.jpg" ALT="alfa1950" WIDTH=341 HEIGHT=169>Formula 1<IMG SRC="mercedes_2015.jpg" ALT="mercedes2015" WIDTH=341 HEIGHT=169></h1>
+</div>
+
+
 
 <?php
 session_start();
@@ -28,7 +40,7 @@ $gps= mysqli_query($link,$queryEvent);
 $queryDriver = "SELECT nm_common, nationality, driver_id  FROM f1_drivers"; 
 $drivers = mysqli_query($link,$queryDriver);
 
-$queryCircuit = "SELECT DISTINCT circuit_id, circuit_nm FROM f1_circuits"; 
+$queryCircuit = "SELECT DISTINCT circuit_id, circuit_nm FROM f1_circuits ORDER BY circuit_nm"; 
 $circuits = mysqli_query($link,$queryCircuit);
 
 $querySchedule = "SELECT DISTINCT SUBSTRING(event_id,1,4) AS event_id FROM f1_events"; 
@@ -60,8 +72,13 @@ $submittedValue = "";
 		}
 	}
 ?>
- <div class = container>
-		<form onsubmit="return mysubmit();">
+<div class = container>
+<div class = table-responsivness>
+echo "<div class = col-xs-3>";
+echo "</div>";
+echo "<div class = col-xs-6>";
+echo "<div class = table-responsive>";
+		 <form onsubmit="return mysubmit();">
 			<select name ="Event"</select>
 			<option value="">Choose Grand Prix</option>
 			<?php
@@ -80,7 +97,7 @@ $submittedValue = "";
 
 		<form action="schedulePage.php" method="get">
 		<select name ="season">
-			<option value="">ChooseSeason</option>
+			<option value="">Choose Season</option>
 			<?php
 				foreach($seasons as $years):
 			?>
@@ -95,7 +112,6 @@ $submittedValue = "";
 		</select>
 		<input type = "submit" name = "submit" value = "Submit"/>
 		</form>
-		
 
 		<form action="driverPage.php" method="get">
 		<select name ="driver">
@@ -133,7 +149,9 @@ $submittedValue = "";
 		</select>
 		<input type = "submit" name = "submit" value = "Submit"/>
 		</form>	
-
+echo "<div class = col-xs-3>";
+echo "</div>";
+</div>
 </div>
 	</body>
 </html>
